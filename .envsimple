@@ -1,0 +1,11 @@
+SERVER_LINK=https://localhost:3000 # backend server link for public files sharing like profile pictures and all
+
+SESSION_SECRET=mySecret # session secret
+
+DB_STRING=mongodb://127.0.0.1:27017 # for a localhost data base
+
+
+ALLOWED_ORIGIN=
+
+
+HTTPS=true
