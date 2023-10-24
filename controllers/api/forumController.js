@@ -1,18 +1,8 @@
 const Post = require('../../model/postModel')
 
 const getForum = async (req, res, next) => {
-  try {
-    const EditedUser = []
 
     let posts = await Post.find().populate('owner');
-
-
-    posts = await Promise.all(posts.map(async (post) => {
-      if (post.likes.length > 0) {
-        await post.populate('likes');
-      }
-      return post
-    }))
 
     posts = posts.map(post => {
       const ownerObject = post.owner.toObject();
@@ -25,11 +15,7 @@ const getForum = async (req, res, next) => {
       delete ownerObject.points
       delete ownerObject.status
 
-
-      // if (!EditedUser.find(userID => userID === ownerObject._id.toString())) {
       ownerObject.thumb = `${process.env.SERVER_LINK}/public/user/${ownerObject.thumb}`
-      // EditedUser.push(ownerObject._id.toString());
-      // }
 
       post.owner = ownerObject;
 
@@ -59,11 +45,7 @@ const getForum = async (req, res, next) => {
           delete ownerObject.points
           delete ownerObject.status
 
-
-          // if (!EditedUser.find(userID => userID === ownerObject._id.toString())) {
           ownerObject.thumb = `${process.env.SERVER_LINK}/public/user/${ownerObject.thumb}`
-          // EditedUser.push(ownerObject._id.toString());
-          // }
           comment.owner = ownerObject;
 
           return comment;
@@ -75,22 +57,15 @@ const getForum = async (req, res, next) => {
 
 
     res.status(200).json(posts);
-  } catch (error) {
-    next(error)
-  }
+
 }
 
 const getForumById = async (req, res, next) => {
-  try {
+
     const post = await Post.findById(req.params.id).populate(['owner']);
 
-    // if (!post)
-    //   return res.status(200).json(post);
-
-
-    if (post.likes.length > 0) {
-      await post.populate('likes');
-    }
+    if (!post)
+      return res.status(204).json({ message: 'No Post Found' });
 
     if (post.comments.length > 0) {
 
@@ -135,31 +110,67 @@ const getForumById = async (req, res, next) => {
     post.owner = ownerObject;
 
     return res.status(200).json(post)
-
-  } catch (error) {
-    next(error)
-  }
 }
 
 const getForumByUser = async (req, res, next) => {
-  try {
-    const post = await Post.findOne({ owner: req.params.id }).populate(['owner']);
+    const userID = req.params.id
+    let posts = await Post.find({ owner: userID }).populate(['owner']);
+  
+    
+    posts.forEach(post => {
+      const ownerObject = post.owner.toObject();
 
-    if (post.comments.length > 0)
-      await post.populate('comments')
+      delete ownerObject.hash
+      delete ownerObject.salt
+      delete ownerObject.status
+      delete ownerObject.email
+      delete ownerObject.mobile
+      delete ownerObject.points
+      delete ownerObject.status
 
-    if (post.likes.length > 0)
-      await post.populate('likes')
+      ownerObject.thumb = `${process.env.SERVER_LINK}/public/user/${ownerObject.thumb}`
 
+      post.owner = ownerObject;
 
-    if (post)
-      return res.status(200).json(post);
+      return post
+    })
+    
+    posts = await Promise.all(posts.map(async (post) => {
+      if (post.comments.length > 0) {
 
-    return res.status(404)
+        await post.populate({
+          path: 'comments',
+          populate: {
+            path: 'owner',
+            model: 'UserModels'
+          }
+        });
 
-  } catch (error) {
-    next(error)
-  }
+        post.comments.forEach(async comment => {
+
+          const ownerObject = comment.owner.toObject();
+          delete ownerObject.hash
+          delete ownerObject.salt
+          delete ownerObject.status
+          delete ownerObject.email
+          delete ownerObject.mobile
+          delete ownerObject.points
+          delete ownerObject.status
+
+          ownerObject.thumb = `${process.env.SERVER_LINK}/public/user/${ownerObject.thumb}`
+          comment.owner = ownerObject;
+
+          return comment;
+        })
+
+      }
+      
+      return post;
+    }));
+    
+
+    return res.status(200).json(posts);
+
 }
 
 

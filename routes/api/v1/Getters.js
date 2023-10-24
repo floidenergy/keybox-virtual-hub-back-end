@@ -1,5 +1,7 @@
 const { Router } = require('express')
 
+const TryCatch = require('../../../utils/TryCatch')
+
 const { getForum, getForumById, getForumByUser } = require('../../../controllers/api/forumController')
 const {GetAllCourses} = require('../../../controllers/api/courseController')
 const { getAllChallenges } = require('../../../controllers/api/challengeController')
@@ -9,17 +11,17 @@ const Getters = Router();
 
 // forum
 Getters.route("/forum")
-  .get(getForum)
+  .get(TryCatch(getForum))
 
 Getters.route('/forum/:id')
-  .get(getForumById);
+  .get(TryCatch(getForumById));
 
 Getters.route('/forum/user/:id')
-  .get(getForumByUser)
+  .get(TryCatch(getForumByUser))
 
 
 // Courses
-Getters.route('/course').get(GetAllCourses)
+Getters.route('/course').get(TryCatch(GetAllCourses))
 
   
   // challenges

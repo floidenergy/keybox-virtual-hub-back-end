@@ -17,11 +17,10 @@ const cors = require('cors')
 const AuthRouter = require('./routes/Auth');
 const ProfileRouter = require('./routes/Profile')
 const ClientRouter = require('./routes/clientRequests')
+const APIRouter = require('./routes/api')
 
-const apiRouter = require('./routes/api')
+const ErrorHandler = require('./controllers/errorHandler')
 
-
-const { Logout } = require('./controllers/UserAccount/logout');
 
 const server = express();
 
@@ -51,37 +50,24 @@ server.use(session({
     }
 }));
 
-server.use(cookieParser("secretText"));
-
+// server.use(cookieParser("secretText"));
 require('./utils/passport');
 server.use(passport.initialize());
 server.use(passport.session());
 
-
 // Getters router
-server.use('/api', apiRouter);
+server.use('/api', APIRouter);
 // Authentication related
 server.use('/auth', AuthRouter);
 // Personal Profile related
 server.use('/profile', ProfileRouter);
 // Client related
 server.use('/client', ClientRouter)
-
-
-
-
-server.get('/', (req, res, next) => res.send('welcome to meralbooks backend server'))
+// default route
+server.use('/', (req, res, next) => res.send('welcome to meralbooks backend server'))
 
 // Error handling
-server.use((err, req, res, next) => {
-    if (err) {
-        console.log(`error: ${err.message}`);
-
-        if (!res.headersSent)
-            res.status(500).json({ message: err?.message });
-    }
-    next();
-})
+server.use(ErrorHandler);
 
 module.exports.mongoose = mongoose;
 module.exports.server = server;

@@ -6,9 +6,9 @@ const cors = require('cors')
 
 const AuthRouter = Router();
 
-const { Login } = require('../controllers/UserAccount/login')
-const { Register } = require('../controllers/UserAccount/register');
-const { Logout } = require('../controllers/UserAccount/logout');
+const { Login } = require('../controllers/Account/login')
+const { Register } = require('../controllers/Account/register');
+const { Logout } = require('../controllers/Account/logout');
 
 
 AuthRouter.post("/login", passport.authenticate('local', {
