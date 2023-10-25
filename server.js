@@ -23,14 +23,15 @@ const ErrorHandler = require('./controllers/errorHandler')
 
 
 const server = express();
-                                        // ALLOWED_ORIGIN
-server.use(cors({ origin: process.env.ALLOWED_ORIGIN , credentials: true }))
+
+// ALLOWED_ORIGIN
 server.use(morgan('dev'))
+server.use(cors({ origin: process.env.ALLOWED_ORIGIN, credentials: true }))
 
 server.use(express.json({ limit: '5mb' }));
 server.use(express.urlencoded({ extended: false }));
 
-server.use('/public',express.static("./public"))
+server.use('/public', express.static("./public"))
 
 server.use(session({
     name: "keyBox_ID",
