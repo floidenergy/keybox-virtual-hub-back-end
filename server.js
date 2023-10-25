@@ -23,8 +23,8 @@ const ErrorHandler = require('./controllers/errorHandler')
 
 
 const server = express();
-
-server.use(cors({ origin: process.env.ALLOWED_ORIGIN.split(', ') , credentials: true }))
+                                        // ALLOWED_ORIGIN
+server.use(cors({ origin: process.env.ALLOWED_ORIGIN.split(",") , credentials: true }))
 server.use(morgan('dev'))
 
 server.use(express.json({ limit: '5mb' }));
@@ -34,7 +34,7 @@ server.use('/public',express.static("./public"))
 
 server.use(session({
     name: "keyBox_ID",
-    secret: "secretText",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: new MongoStorage({
