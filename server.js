@@ -24,7 +24,7 @@ const ErrorHandler = require('./controllers/errorHandler')
 
 const server = express();
 
-server.use(cors({ origin: ['https://localhost:5173', "https://localhost:8000"], credentials: true }))
+server.use(cors({ origin: process.env.ALLOWED_ORIGIN.split(', ') , credentials: true }))
 server.use(morgan('dev'))
 
 server.use(express.json({ limit: '5mb' }));
